@@ -42,9 +42,47 @@ export class OrderListView extends React.PureComponent<IOrdersProps, any> {
         this.getMarkers = this.getMarkers.bind(this);
     }
 
-    async getMarkersPositionByips(ips: Array<string>) {
-        let temMarkers: Array<object> = new Array<object>();
-        ips.map((ip, idx) => {
+    getIPs() {
+        return new Promise((resolve, reject) => {
+            // Axios.get('http://server.bensyan.top:8080/ip').then((res) => {
+            //     if (res.status == 200) {
+            //         let data = res.data.data;
+            //         let ips = new Array<string>();
+            //         data.map((obj: any, idx: any) => {
+            //             ips.push(obj.address);
+            //         })
+            //         resolve(ips);
+            //     } else {
+            //         reject('error')
+            //     }
+            // })
+
+            let data = {
+                data: [
+                    {
+                        address: '120.236.174.160',
+                        times: 8,
+                    },
+                    {
+                        address: '144.34.147.132',
+                        times: 1,
+                    },
+                    {
+                        address: '64.242.33.12',
+                        times: 1,
+                    },
+                ],
+            };
+            let ips = new Array<string>();
+            data.data.map((obj: any, idx: any) => {
+                ips.push(obj.address);
+            });
+            resolve(ips);
+        });
+    }
+
+    getMarkerPositionByip(ip: object) {
+        return new Promise((resolve, reject) => {
             Axios.get(
                 'http://api.ipstack.com/' +
                     ip +
@@ -58,48 +96,42 @@ export class OrderListView extends React.PureComponent<IOrdersProps, any> {
                                 longitude: res.data.longitude,
                             },
                         };
-                        temMarkers.push(d);
+                        resolve(d);
                     }
                 })
                 .catch(rej => {
-                    console.log(rej);
+                    reject(rej);
                 });
-        });
-
-        return new Promise((reslove, reject) => {
-            if (temMarkers.length == 0) {
-                reject();
-            } else {
-                reslove(temMarkers);
-            }
         });
     }
 
-    getMarkers() {
-        this.getMarkersPositionByips(['47.96.67.93'])
+    setMarkers(ips: any) {
+        let promises = ips.map((ip: any, idx: any) => {
+            return this.getMarkerPositionByip(ip);
+        });
+        Promise.all(promises)
             .then(res => {
                 this.setState({
-                    markers: [
-                        {
-                            position: {
-                                latitude: 38,
-                                longitude: 117,
-                            },
-                        },
-                        {
-                            position: {
-                                latitude: 33,
-                                longitude: 118,
-                            },
-                        },
-                    ],
+                    markers: res,
                 });
             })
             .catch(rej => {
+                console.warn(rej);
                 this.setState({
-                    markers: null,
+                    markers: [],
                 });
             });
+    }
+
+    getMarkers() {
+        this.getIPs()
+            .then(res => {
+                this.setMarkers(res);
+            })
+            .catch(rej => {
+                console.log(rej);
+            });
+        //   this.setMarkers(["47.96.67.93", "149.248.60.54"]);
     }
 
     public render() {
