@@ -44,40 +44,19 @@ export class OrderListView extends React.PureComponent<IOrdersProps, any> {
 
     getIPs() {
         return new Promise((resolve, reject) => {
-            // Axios.get('http://server.bensyan.top:8080/ip').then((res) => {
-            //     if (res.status == 200) {
-            //         let data = res.data.data;
-            //         let ips = new Array<string>();
-            //         data.map((obj: any, idx: any) => {
-            //             ips.push(obj.address);
-            //         })
-            //         resolve(ips);
-            //     } else {
-            //         reject('error')
-            //     }
-            // })
-
-            let data = {
-                data: [
-                    {
-                        address: '120.236.174.160',
-                        times: 8,
-                    },
-                    {
-                        address: '144.34.147.132',
-                        times: 1,
-                    },
-                    {
-                        address: '64.242.33.12',
-                        times: 1,
-                    },
-                ],
-            };
-            let ips = new Array<string>();
-            data.data.map((obj: any, idx: any) => {
-                ips.push(obj.address);
+            Axios.get('http://server.bensyan.top:8080/ip').then(res => {
+                if (res.status == 200) {
+                    let data = res.data.data;
+                    let ips = new Array<string>();
+                    data.map((obj: any, idx: any) => {
+                        // if (obj.address != '127.0.0.1')
+                        ips.push(obj.address);
+                    });
+                    resolve(ips);
+                } else {
+                    reject('error');
+                }
             });
-            resolve(ips);
         });
     }
 
@@ -90,13 +69,25 @@ export class OrderListView extends React.PureComponent<IOrdersProps, any> {
             )
                 .then(res => {
                     if (res.status == 200) {
-                        let d = {
-                            position: {
-                                latitude: res.data.latitude,
-                                longitude: res.data.longitude,
-                            },
-                        };
-                        resolve(d);
+                        if (res.data.latitude && res.data.longitude) {
+                            let d = {
+                                position: {
+                                    latitude: res.data.latitude,
+                                    longitude: res.data.longitude,
+                                },
+                            };
+                            resolve(d);
+                        } else {
+                            let d = {
+                                position: {
+                                    latitude: 0,
+                                    longitude: 0,
+                                },
+                            };
+                            resolve(d);
+                        }
+                    } else {
+                        reject('error');
                     }
                 })
                 .catch(rej => {
