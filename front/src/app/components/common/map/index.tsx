@@ -15,17 +15,12 @@ export class Map extends React.Component<ImapProps, any> {
         this.getMarkers = this.getMarkers.bind(this);
     }
 
-    getIPs() {
+    getDatasFromServer() {
         return new Promise((resolve, reject) => {
             Axios.get('http://server.bensyan.top:8080/ip').then(res => {
                 if (res.status == 200) {
-                    let data = res.data.data;
-                    let ips = new Array<string>();
-                    data.map((obj: any, idx: any) => {
-                        // if (obj.address != '127.0.0.1')
-                        ips.push(obj.address);
-                    });
-                    resolve(ips);
+                    let datas = res.data.data;
+                    resolve(datas);
                 } else {
                     reject('error');
                 }
@@ -33,11 +28,11 @@ export class Map extends React.Component<ImapProps, any> {
         });
     }
 
-    getMarkerPositionByip(ip: object) {
+    getMarkerPositionByData(data: any) {
         return new Promise((resolve, reject) => {
             Axios.get(
                 'http://api.ipstack.com/' +
-                    ip +
+                    data.address +
                     '?access_key=0e4b3fc9bb7012613b5f8b77b422dc20',
             )
                 .then(res => {
@@ -48,7 +43,8 @@ export class Map extends React.Component<ImapProps, any> {
                                     latitude: res.data.latitude,
                                     longitude: res.data.longitude,
                                 },
-                                ip: ip,
+                                ip: data.address,
+                                times: data.times,
                             };
                             resolve(d);
                         } else {
@@ -57,7 +53,8 @@ export class Map extends React.Component<ImapProps, any> {
                                     latitude: 0,
                                     longitude: 0,
                                 },
-                                ip: ip,
+                                ip: data.address,
+                                times: data.times,
                             };
                             resolve(d);
                         }
@@ -71,9 +68,9 @@ export class Map extends React.Component<ImapProps, any> {
         });
     }
 
-    setMarkers(ips: any) {
-        let promises = ips.map((ip: any, idx: any) => {
-            return this.getMarkerPositionByip(ip);
+    setMarkers(datas: any) {
+        let promises = datas.map((data: any, idx: any) => {
+            return this.getMarkerPositionByData(data);
         });
         Promise.all(promises)
             .then(res => {
@@ -90,7 +87,7 @@ export class Map extends React.Component<ImapProps, any> {
     }
 
     getMarkers() {
-        this.getIPs()
+        this.getDatasFromServer()
             .then(res => {
                 this.setMarkers(res);
             })
@@ -108,6 +105,7 @@ export class Map extends React.Component<ImapProps, any> {
                 infoposition: extData.position,
                 infovisible: true,
                 ip: extData.ip,
+                times: extData.times,
             });
         },
         mouseout: (e: any, marker: any) => {
@@ -133,8 +131,8 @@ export class Map extends React.Component<ImapProps, any> {
                         offset={[0, -20]}
                     >
                         <div className="infowindow">
-                            <h1>IP Address</h1>
-                            <p>{this.state.ip}</p>
+                            <p>IP Address {this.state.ip}</p>
+                            <p>Times {this.state.times}</p>
                         </div>
                     </Amap.InfoWindow>
                 </Amap.Map>
