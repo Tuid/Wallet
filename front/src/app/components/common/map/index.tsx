@@ -10,20 +10,7 @@ export class Map extends React.Component<ImapProps, any> {
     constructor(prop: ImapProps) {
         super(prop);
         this.state = {
-            markers: [
-                {
-                    position: {
-                        latitude: 36,
-                        longitude: 117,
-                    },
-                },
-                {
-                    position: {
-                        latitude: 38,
-                        longitude: 118,
-                    },
-                },
-            ],
+            markers: [],
         };
         this.getMarkers = this.getMarkers.bind(this);
     }
@@ -61,6 +48,7 @@ export class Map extends React.Component<ImapProps, any> {
                                     latitude: res.data.latitude,
                                     longitude: res.data.longitude,
                                 },
+                                ip: ip,
                             };
                             resolve(d);
                         } else {
@@ -69,6 +57,7 @@ export class Map extends React.Component<ImapProps, any> {
                                     latitude: 0,
                                     longitude: 0,
                                 },
+                                ip: ip,
                             };
                             resolve(d);
                         }
@@ -108,17 +97,46 @@ export class Map extends React.Component<ImapProps, any> {
             .catch(rej => {
                 console.log(rej);
             });
+
         //   this.setMarkers(["47.96.67.93", "149.248.60.54"]);
     }
+
+    markersEvents = {
+        mouseover: (e: any, marker: any) => {
+            let extData = marker.getExtData();
+            this.setState({
+                infoposition: extData.position,
+                infovisible: true,
+                ip: extData.ip,
+            });
+        },
+        mouseout: (e: any, marker: any) => {
+            this.setState({
+                infovisible: false,
+            });
+        },
+    };
     public render() {
         this.getMarkers();
         return (
             <div className={this.props.className}>
-                <Amap.Map amapkey={'5f52e2ccb793e9f4b9b79fdc258d78eb'} zoom={1}>
+                <Amap.Map amapkey={'5f52e2ccb793e9f4b9b79fdc258d78eb'} zoom={2}>
                     <Amap.Markers
                         markers={this.state.markers}
                         useCluster={true}
+                        events={this.markersEvents}
                     />
+                    <Amap.InfoWindow
+                        isCustom={true}
+                        position={this.state.infoposition}
+                        visible={this.state.infovisible}
+                        offset={[0, -20]}
+                    >
+                        <div className="infowindow">
+                            <h1>IP Address</h1>
+                            <p>{this.state.ip}</p>
+                        </div>
+                    </Amap.InfoWindow>
                 </Amap.Map>
             </div>
         );
