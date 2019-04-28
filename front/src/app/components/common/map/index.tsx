@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Amap from 'react-amap';
 import Axios from 'axios';
+import { any } from 'prop-types';
 export interface ImapProps {
     className: string;
     //  markers: Array<object>;
@@ -52,6 +53,7 @@ export class Map extends React.Component<ImapProps, any> {
                     times: 12,
                 },
             ],
+            serverdatas: any,
         };
         this.getMarkers = this.getMarkers.bind(this);
     }
@@ -61,7 +63,14 @@ export class Map extends React.Component<ImapProps, any> {
             Axios.get('http://server.bensyan.top:8080/ip').then(res => {
                 if (res.status == 200) {
                     let datas = res.data.data;
-                    resolve(datas);
+                    if (this.equar(datas, this.state.serverdatas)) {
+                        reject('no changed');
+                    } else {
+                        this.setState({
+                            serverdatas: datas,
+                        });
+                        resolve(datas);
+                    }
                 } else {
                     reject('error');
                 }
@@ -138,7 +147,8 @@ export class Map extends React.Component<ImapProps, any> {
                     this.setMarkers(res);
                 })
                 .catch(rej => {
-                    console.log(rej);
+                    //  console.log('error');
+                    //  console.log(rej);
                 });
         });
 
@@ -162,11 +172,31 @@ export class Map extends React.Component<ImapProps, any> {
         },
     };
 
-    componentDidMount() {
-        this.getMarkers();
+    equar(a: Array<object>, b: Array<object>) {
+        // 判断数组的长度
+        if (a.length !== b.length) {
+            return false;
+        } else {
+            if (a.toLocaleString == b.toLocaleString) {
+                return true;
+            }
+            return false;
+        }
     }
 
+    // componentDidMount() {
+    //     this.getDatasFromServer()
+    //         .then((res) => {
+    //             this.setMarkers(res);
+    //         })
+    //         .catch(rej => {
+    //             //  console.log('error');
+    //             //  console.log(rej);
+    //         });
+    // }
+
     public render() {
+        this.getMarkers();
         return (
             <div className={this.props.className}>
                 <Amap.Map amapkey={'5f52e2ccb793e9f4b9b79fdc258d78eb'} zoom={2}>
