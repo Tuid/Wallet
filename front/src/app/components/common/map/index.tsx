@@ -1,7 +1,6 @@
 import * as React from 'react';
 import * as Amap from 'react-amap';
 import Axios from 'axios';
-import { any } from 'prop-types';
 export interface ImapProps {
     className: string;
     //  markers: Array<object>;
@@ -53,7 +52,7 @@ export class Map extends React.Component<ImapProps, any> {
                     times: 12,
                 },
             ],
-            serverdatas: any,
+            serverdatas: [],
         };
         this.getMarkers = this.getMarkers.bind(this);
     }
