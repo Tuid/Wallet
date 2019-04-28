@@ -10,7 +10,48 @@ export class Map extends React.Component<ImapProps, any> {
     constructor(prop: ImapProps) {
         super(prop);
         this.state = {
-            markers: [],
+            markers: [
+                {
+                    position: {
+                        latitude: 30,
+                        longitude: 100,
+                    },
+                    ip: '44.125.32.12',
+                    times: 8,
+                },
+                {
+                    position: {
+                        latitude: 23,
+                        longitude: 115,
+                    },
+                    ip: '149.22.55.4',
+                    times: 2,
+                },
+                {
+                    position: {
+                        latitude: 24,
+                        longitude: 116,
+                    },
+                    ip: '149.22.51.4',
+                    times: 2,
+                },
+                {
+                    position: {
+                        latitude: 34,
+                        longitude: -118,
+                    },
+                    ip: '42.23.56.45',
+                    times: 10,
+                },
+                {
+                    position: {
+                        latitude: 34,
+                        longitude: -100,
+                    },
+                    ip: '42.23.11.45',
+                    times: 12,
+                },
+            ],
         };
         this.getMarkers = this.getMarkers.bind(this);
     }
@@ -87,13 +128,19 @@ export class Map extends React.Component<ImapProps, any> {
     }
 
     getMarkers() {
-        this.getDatasFromServer()
-            .then(res => {
-                this.setMarkers(res);
-            })
-            .catch(rej => {
-                console.log(rej);
-            });
+        return new Promise((res, rej) => {
+            setInterval(() => {
+                res();
+            }, 60000);
+        }).then(res => {
+            this.getDatasFromServer()
+                .then(res => {
+                    this.setMarkers(res);
+                })
+                .catch(rej => {
+                    console.log(rej);
+                });
+        });
 
         //   this.setMarkers(["47.96.67.93", "149.248.60.54"]);
     }
@@ -114,8 +161,12 @@ export class Map extends React.Component<ImapProps, any> {
             });
         },
     };
-    public render() {
+
+    componentDidMount() {
         this.getMarkers();
+    }
+
+    public render() {
         return (
             <div className={this.props.className}>
                 <Amap.Map amapkey={'5f52e2ccb793e9f4b9b79fdc258d78eb'} zoom={2}>
