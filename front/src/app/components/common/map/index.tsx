@@ -184,16 +184,16 @@ export class Map extends React.Component<ImapProps, any> {
         }
     }
 
-    // componentDidMount() {
-    //     this.getDatasFromServer()
-    //         .then((res) => {
-    //             this.setMarkers(res);
-    //         })
-    //         .catch(rej => {
-    //             //  console.log('error');
-    //             //  console.log(rej);
-    //         });
-    // }
+    componentDidMount() {
+        this.getDatasFromServer()
+            .then(res => {
+                this.setMarkers(res);
+            })
+            .catch(rej => {
+                //  console.log('error');
+                //  console.log(rej);
+            });
+    }
 
     public render() {
         this.getMarkers();
