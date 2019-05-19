@@ -78,7 +78,7 @@ export class PlaceOrderBox extends React.Component<ITestProps, any> {
         var sidechainVASYA = await vasyaSidechainClient.createAccount(addr);
         vasyaSidechainClient.setPrivateKey(pk);
 
-        console.log(this.benchmarks);
+        //  console.log(this.benchmarks);
 
         const res = await sidechainVASYA.createOrder({
             orderType: 1,
