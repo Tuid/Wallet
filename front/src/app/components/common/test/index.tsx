@@ -37,7 +37,7 @@ export class Test extends React.Component<ITestProps, any> {
                     onChange={this.props.updateStateProp}
                 />
 
-                <button onClick={this.testClick}> Test</button>
+                <button onClick={this.testClick}> testButton</button>
             </div>
         );
     }
